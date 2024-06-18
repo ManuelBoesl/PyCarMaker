@@ -39,14 +39,12 @@ class DataSerializer:
                 constants.PITCH: traffic_object_data.pitch.data,
                 constants.YAW: traffic_object_data.yaw.data,
                 constants.ID: traffic_object_data.id,
-                constants.TYPE: traffic_object_data.type,
-                constants.VEL_X: traffic_object_data.vel_x.data,
-                constants.VEL_Y: traffic_object_data.vel_y.data
+                constants.STEER_ANGLE: traffic_object_data.steer_angle.data
             })
 
         return serialized_data
 
     def serialize_data_as_json(self, ego_vehicle_data: TrafficObjectData, traffic_object_data_list: list, timestamp: Quantity,
                                sim_status: Quantity):
-        return json.dumps(self.serialize_data(ego_vehicle_data, traffic_object_data_list, timestamp, sim_status))
+        return json.dumps(self.serialize_data(ego_vehicle_data, traffic_object_data_list, timestamp, sim_status), indent=4)
 

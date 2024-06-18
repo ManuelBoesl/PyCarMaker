@@ -24,6 +24,7 @@ class ReadCMQuantities:
         self.read_traffic_object_dict()
         self.subscribe_to_quantities()
         self.wait_for_start()
+        self.read_cm_quantities()
 
     def read_traffic_object_dict(self):
         # get the path to the directory of this file
@@ -73,13 +74,17 @@ class ReadCMQuantities:
 
         print("CarMaker started the sim")
 
-    def read(self):
+    def read_cm_quantities(self):
         self.cm.read()
 
-        while self.cm.status_dic.get(self.sim_status.data) != "Idle":
+        while self.sim_status.data >= 0 or self.cm.status_dic.get(self.sim_status.data) == "Preprocessing":
             self.cm.read()
             serialized_json_data = self.data_serializer.serialize_data_as_json(self.ego_vehicle_data, self.traffic_object_data_list, self.timestamp, self.sim_status)
             # self.udp_sender.send_json(serialized_json_data)
-            self.udp_sender.write_to_file(serialized_json_data)
+            if self.sim_status.data >= 0:
+                self.udp_sender.write_to_file(serialized_json_data)
             time.sleep(0.001)
+
+if __name__ == '__main__':
+    ReadCMQuantities()
 
