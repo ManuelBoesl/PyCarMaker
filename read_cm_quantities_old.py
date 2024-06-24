@@ -1,4 +1,4 @@
-from pycarmaker import CarMaker, Quantity
+from CarMaker import CarMaker, Quantity
 import constants
 import os
 import time
