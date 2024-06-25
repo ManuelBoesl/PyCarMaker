@@ -1,5 +1,6 @@
 from PySide6.QtCore import QRunnable, Slot, Signal, QObject
 import os
+from read_cm_quantities import ReadCMQuantities
 
 class FindCmWorker(QObject, QRunnable):
     finished = Signal(list)
@@ -12,10 +13,10 @@ class FindCmWorker(QObject, QRunnable):
         cm_versions = os.listdir(cm_versions_path)
         self.finished.emit(cm_versions)
 
-class ReadCmQuantitites(QObject, QRunnable):
+class ReadCmQuantititesWorker(QObject, QRunnable):
     finished = Signal()
 
     @Slot()
     def run(self):
-        print("Reading CM Quantities")
+        read_cm_quantities = ReadCMQuantities()
         self.finished.emit()

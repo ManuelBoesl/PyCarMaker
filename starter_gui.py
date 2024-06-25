@@ -6,7 +6,7 @@ import sys
 import os
 import qdarktheme
 
-from gui_backend import FindCmWorker
+from gui_backend import FindCmWorker, ReadCmQuantititesWorker
 
 
 class MainWindow(QMainWindow):
@@ -14,7 +14,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         qdarktheme.setup_theme()
         self.setWindowTitle("Dropdown Menu Example")
-
+        self.worker = None
         # Set the window size
         self.resize(400, 200)  # width: 400, height: 200
 
@@ -53,9 +53,17 @@ class MainWindow(QMainWindow):
     def update_combo_box(self, cm_versions):
         self.combo_box.addItems(cm_versions)
         self.chosen_cm_version = cm_versions[0]
-        self.combo_box.currentIndexChanged.connect(self.on_combo_box_changed)
+        self.combo_box.currentIndexChanged.connect(lambda index: self.on_combo_box_changed(index, cm_versions))
+
+    def on_combo_box_changed(self, index, cm_versions):
+        self.chosen_cm_version = cm_versions[index]
+
 
     def on_ok_clicked(self):
+        complete_car_maker_exe_path = os.path.join(os.environ['IPGHOME'], "carmaker", self.chosen_cm_version, "bin", "CM.exe")
+        # Execute the CarMaker executable with the opetion -cmdport 16660
+        os.system(f"{complete_car_maker_exe_path} -cmdport 16660")
+
 
         # Clear the current layout
         for i in reversed(range(self.layout.count())):
@@ -64,12 +72,19 @@ class MainWindow(QMainWindow):
                 widget.deleteLater()
 
         # Create a label with the text "Are you Ready?"
-        self.ready_label = QLabel("Are you Ready?")
+        self.ready_label = QLabel("Start the simulation once. After that, press the Ready button.")
         self.layout.addWidget(self.ready_label)
 
         # Create a new button with the text "Ready"
         self.ready_button = QPushButton("Ready")
         self.layout.addWidget(self.ready_button)
+        self.ready_button.clicked.connect(self.on_ready_clicked)
+
+    def on_ready_clicked(self):
+        self.worker = ReadCmQuantititesWorker()
+        self.worker.finished.connect(self.on_read_cm_quantities_finished)
+        self.thread_pool.start(self.worker)
+
 
 if __name__ == "__main__":
     # Set the environment variable for demonstration purposes
